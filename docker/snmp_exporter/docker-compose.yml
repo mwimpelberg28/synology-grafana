@@ -1,0 +1,26 @@
+version: '3.8'
+
+volumes:
+  vol_nfs_snmp_exporter:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.4.20.42
+      device: ":/volume1/docker/snmp_exporter"
+networks:
+  bridge_prometheus:
+    external: true
+
+services:
+  snmp_exporter:
+    image: prom/snmp-exporter:latest
+    container_name: snmp_exporter
+    networks:
+        bridge_prometheus:
+    volumes:
+      - vol_nfs_snmp_exporter:/etc/snmp_exporter/:ro
+    ports:
+      - "9116:9116"
+    command:
+      - '--config.file=/etc/snmp_exporter/snmp.yml'
+    restart: always
